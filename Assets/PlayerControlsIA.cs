@@ -5,9 +5,7 @@ public class PlayerControlsIA : MonoBehaviour
     public string puckName = "puck_0";
     private Transform puck;
 
-    public float speed = 8f;
-
-    // limites
+    // limites (os seus)
     public float minX = -3.1f;
     public float maxX =  3.03f;
     public float minY =  0f;
@@ -15,43 +13,70 @@ public class PlayerControlsIA : MonoBehaviour
 
     public float radius = 0.35f;
 
-    // comportamento
-    public float defendY = 3.7f;  // posição de defesa (perto do gol)
-    public float attackY = 2.2f;  // posição de ataque (mais pra frente)
-    public float attackWhenPuckAboveY = 0.2f; // se puck passar disso, IA ataca
+    // defesa/ataque
+    public float defendY = 3.6f;
+    public float attackY = 2.2f;
+    public float attackWhenPuckAboveY = 0.2f;
+
+    // movimento
+    public float speed = 7f; // deixa 6~9
+
+    private Rigidbody2D rb;
+    private Vector2 targetPos;
 
     void Start()
     {
+        rb = GetComponent<Rigidbody2D>();
+
         GameObject obj = GameObject.Find(puckName);
         if (obj != null) puck = obj.transform;
 
         // começa defendendo
-        Vector3 p = transform.position;
-        p.y = defendY;
-        transform.position = p;
+        targetPos = new Vector2(transform.position.x, defendY);
     }
 
     void Update()
     {
         if (!puck) return;
 
-        // alvo X: sempre seguir o puck
-        float targetX = Mathf.Clamp(puck.position.x, minX + radius, maxX - radius);
+        // X sempre segue o puck
+        float tx = Mathf.Clamp(puck.position.x, minX + radius, maxX - radius);
 
-        // alvo Y: defende ou ataca
-        float targetY = (puck.position.y > attackWhenPuckAboveY) ? attackY : defendY;
-        targetY = Mathf.Clamp(targetY, minY + radius, maxY - radius);
+        float ty;
 
-        Vector3 pos = transform.position;
+        // Se o puck está na metade de cima, persegue o Y do puck (ATACA de verdade)
+        if (puck.position.y > attackWhenPuckAboveY)
+        {
+            // segue o puck no Y, mas com um offset pra “bater” nele (opcional)
+            ty = puck.position.y - 0.25f;
+        }
+        else
+        {
+            // se o puck está embaixo, volta pra posição de defesa
+            ty = defendY;
+        }
 
-        // move suave nos dois eixos
-        pos.x = Mathf.MoveTowards(pos.x, targetX, speed * Time.deltaTime);
-        pos.y = Mathf.MoveTowards(pos.y, targetY, speed * Time.deltaTime);
+        // limita no campo da IA
+        ty = Mathf.Clamp(ty, minY + radius, maxY - radius);
+
+        targetPos = new Vector2(tx, ty);
+    }
+
+
+    void FixedUpdate()
+    {
+        if (rb == null) return;
+
+        Vector2 current = rb.position;
+
+        // move suave “físico”
+        Vector2 next = Vector2.MoveTowards(current, targetPos, speed * Time.fixedDeltaTime);
 
         // clamp final
-        pos.x = Mathf.Clamp(pos.x, minX + radius, maxX - radius);
-        pos.y = Mathf.Clamp(pos.y, minY + radius, maxY - radius);
+        next.x = Mathf.Clamp(next.x, minX + radius, maxX - radius);
+        next.y = Mathf.Clamp(next.y, minY + radius, maxY - radius);
 
-        transform.position = pos;
+        rb.MovePosition(next);
     }
 }
+    
