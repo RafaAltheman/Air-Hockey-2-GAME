@@ -5,13 +5,11 @@ public class BallControl : MonoBehaviour
 
     private Rigidbody2D rb2d;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         rb2d = GetComponent<Rigidbody2D>();
     }
 
-    // Update is called once per frame
     void Update()
     {
         
@@ -26,13 +24,11 @@ public class BallControl : MonoBehaviour
         }
     }
 
-        // Reinicializa a posição e velocidade da bola
     void ResetBall(){
         rb2d.linearVelocity = Vector2.zero;
         transform.position = Vector2.zero;
     }
 
-    // Reinicializa o jogo
     void RestartGame(){
         ResetBall();
         Invoke("GoBall", 1);

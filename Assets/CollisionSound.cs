@@ -4,7 +4,7 @@ using UnityEngine;
 public class CollisionSound : MonoBehaviour
 {
     public AudioClip hit;
-    public float minInterval = 0.05f; // evita metralhadora de som
+    public float minInterval = 0.05f; 
     public float volume = 0.6f;
 
     private AudioSource audioSrc;
