@@ -32,7 +32,6 @@ public class PuckReset : MonoBehaviour
         LaunchBall();
     }
 
-    // isTopGoal = true quando entrou no gol de cima (ponto pro de baixo)
     public void OnGoalScored(bool isTopGoal)
     {
         if (resetting) return;
