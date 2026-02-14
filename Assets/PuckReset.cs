@@ -1,6 +1,5 @@
 using System.Collections;
 using UnityEngine;
-using TMPro;
 
 public class PuckReset : MonoBehaviour
 {
@@ -8,28 +7,23 @@ public class PuckReset : MonoBehaviour
     public Vector2 puckStartPosition = Vector2.zero;
     public Transform playerBottom;
     public Transform playerTop;
-    public Vector2 playerBottomStart;
-    public Vector2 playerTopStart;
 
     [Header("Ball")]
     public float startSpeed = 6f;
-    public float goalDelay = 4.0f; 
+    public float goalDelay = 2.0f;
 
     [Header("Freeze")]
     public bool freezePlayersDuringGoal = true;
 
-    [Header("UI")]
-    public TMP_Text goalText; 
-    public string goalMessage = "GOL!";
-
     Rigidbody2D rb;
     bool resetting = false;
+
+    Vector2 playerBottomStart;
+    Vector2 playerTopStart;
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-
-        if (goalText) goalText.gameObject.SetActive(false);
 
         if (playerBottom) playerBottomStart = playerBottom.position;
         if (playerTop)    playerTopStart    = playerTop.position;
@@ -38,7 +32,8 @@ public class PuckReset : MonoBehaviour
         LaunchBall();
     }
 
-    public void OnGoalScored()
+    // isTopGoal = true quando entrou no gol de cima (ponto pro de baixo)
+    public void OnGoalScored(bool isTopGoal)
     {
         if (resetting) return;
         StartCoroutine(ResetAfterGoal());
@@ -48,12 +43,6 @@ public class PuckReset : MonoBehaviour
     {
         resetting = true;
 
-        if (goalText)
-        {
-            goalText.text = goalMessage;
-            goalText.gameObject.SetActive(true);
-        }
-
         rb.linearVelocity = Vector2.zero;
         rb.angularVelocity = 0f;
 
@@ -61,26 +50,23 @@ public class PuckReset : MonoBehaviour
         if (freezePlayersDuringGoal)
         {
             if (playerBottom) rbBottom = playerBottom.GetComponent<Rigidbody2D>();
-            if (playerTop) rbTop = playerTop.GetComponent<Rigidbody2D>();
+            if (playerTop)    rbTop    = playerTop.GetComponent<Rigidbody2D>();
 
             if (rbBottom) rbBottom.simulated = false;
-            if (rbTop) rbTop.simulated = false;
+            if (rbTop)    rbTop.simulated = false;
         }
 
         yield return new WaitForSeconds(goalDelay);
-
-        if (goalText) goalText.gameObject.SetActive(false);
 
         HardResetImmediate();
 
         if (freezePlayersDuringGoal)
         {
             if (rbBottom) rbBottom.simulated = true;
-            if (rbTop) rbTop.simulated = true;
+            if (rbTop)    rbTop.simulated = true;
         }
 
         LaunchBall();
-
         resetting = false;
     }
 
