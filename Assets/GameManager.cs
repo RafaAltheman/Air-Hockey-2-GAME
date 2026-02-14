@@ -6,15 +6,15 @@ public class GameManager : MonoBehaviour
     public TMP_Text scoreText;
     public PuckReset puckReset;
 
-    int scoreTop = 0;     // IA (cima)
-    int scoreBottom = 0;  // Mouse (baixo)
+    int scoreTop = 0;     
+    int scoreBottom = 0;  
 
     void Start()
     {
         UpdateUI();
     }
 
-    // Chamado quando a bola entra no gol de cima => ponto pro de baixo
+
     public void GoalTop()
     {
         scoreBottom++;
@@ -24,7 +24,7 @@ public class GameManager : MonoBehaviour
             puckReset.OnGoalScored(true);
     }
 
-    // Chamado quando a bola entra no gol de baixo => ponto pro de cima
+
     public void GoalBottom()
     {
         scoreTop++;
